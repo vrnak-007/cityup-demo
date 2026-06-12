@@ -74,6 +74,20 @@ Role se přepínají lištou nahoře, nebo přímo přes hash.
 |---|---|
 | Dashboard — KPI, SLA, spokojenost, výběr poplatků, mapa, report | `#starosta/dashboard` |
 
+### Správce (průvodce nastavením)
+| Obrazovka | Hash |
+|---|---|
+| Průvodce nastavením (9 kroků, živý náhled) | `#spravce/pruvodce` |
+| Portál spuštěn — success | `#spravce/hotovo` |
+| Správa obce (po spuštění) | `#spravce/sprava` |
+
+Průvodce má vlevo konfiguraci, vpravo **živý náhled portálu občana** v rámu mobilu,
+který reaguje okamžitě na každou změnu (název, znak, agendy, uvítací text). Nahoře běží
+reálný měřič „Nastavujete …". Kroky: 1 Obec (ARES) · 2 Adresa portálu · 3 Agendy ·
+4 Sazby z vyhlášky (živá kalkulačka) · 5 Platby (VS builder + test QR) · 6 Doručování ·
+7 Úředníci (2FA) · 8 Texty · 9 Kontrola a spuštění. Po spuštění se SPRÁVCE otevírá do
+Správy obce, odkud lze každou sekci upravit skokem do příslušného kroku.
+
 ---
 
 ## Co je mock (a co reálné)
