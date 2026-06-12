@@ -100,7 +100,7 @@ const SPECS: Spec[] = [
   { agenda: 'Ověření podpisu', zadatel: 'Petr Svoboda', email: 'petr.s@email.cz', castka: 100, stav: 'vyrizeno', resitel: 'Dvořáková', podanoDni: 14, prevzatoDni: 13, vyrizenoDni: 5, hodnoceni: 4 },
   { agenda: 'Obecné podání', zadatel: 'Eva Horáková', email: 'e.horakova@email.cz', castka: 0, stav: 'vyrizeno', resitel: 'Nováková', podanoDni: 11, prevzatoDni: 10, vyrizenoDni: 9, hodnoceni: 5 },
   { agenda: 'Odpad', zadatel: 'Tomáš Král', email: 't.kral@email.cz', castka: 1200, stav: 'vyrizeno', resitel: 'Svoboda', podanoDni: 8, prevzatoDni: 7, vyrizenoDni: 6, hodnoceni: 5 },
-  { agenda: 'Psi', zadatel: 'Lenka Marková', email: 'l.markova@email.cz', castka: 200, stav: 'vyrizeno', resitel: 'Nováková', podanoDni: 15, prevzatoDni: 14, vyrizenoDni: 6, hodnoceni: 3 },
+  { agenda: 'Psi', zadatel: 'Lenka Marková', email: 'l.markova@email.cz', castka: 200, stav: 'vyrizeno', resitel: 'Nováková', podanoDni: 15, prevzatoDni: 14, vyrizenoDni: 11, hodnoceni: 3 },
   { agenda: 'Stavební úřad', zadatel: 'Josef Beneš', email: 'j.benes@email.cz', castka: 0, stav: 'vyrizeno', resitel: 'Dvořáková', podanoDni: 10, prevzatoDni: 9, vyrizenoDni: 8 },
   { agenda: 'Obecné podání', zadatel: 'Hana Pokorná', email: 'h.pokorna@email.cz', castka: 0, stav: 'vyrizeno', resitel: 'Svoboda', podanoDni: 7, prevzatoDni: 6, vyrizenoDni: 5 },
 
