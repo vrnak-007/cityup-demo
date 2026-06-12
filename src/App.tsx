@@ -17,6 +17,7 @@ import { Grants } from './screens/obcan/Grants'
 import { Queue } from './screens/urednik/Queue'
 import { SubmissionDetail } from './screens/urednik/SubmissionDetail'
 import { Kanban } from './screens/urednik/Kanban'
+import { ReportDetail } from './screens/urednik/ReportDetail'
 import { Dashboard } from './screens/starosta/Dashboard'
 
 function Placeholder({ name }: { name: string }) {
@@ -96,6 +97,9 @@ export function App() {
       break
     case 'urednik/podnety':
       content = <Kanban />
+      break
+    case 'urednik/podnet':
+      content = <ReportDetail />
       break
     // ---- STAROSTA ----
     case 'starosta/dashboard':

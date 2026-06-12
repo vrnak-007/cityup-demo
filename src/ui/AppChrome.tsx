@@ -82,7 +82,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-line bg-paper">
-        <div className="mx-auto max-w-app px-4 py-6 text-caption text-ink-soft">
+        <div className="mx-auto max-w-app px-4 py-6 text-center text-caption text-ink-soft">
           Obec Hvozdnice · Demo portálu CityUp · Design dle gov.cz
         </div>
       </footer>
