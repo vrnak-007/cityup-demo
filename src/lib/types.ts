@@ -40,6 +40,10 @@ export interface Report {
   createdAt: string
   hasPhoto: boolean
   response?: string // obec's reply shown in the public map popup
+  odbor?: string // odbor auto-přidělený dle kategorie
+  dniOtevreno?: number // jak dlouho otevřeno / doba řešení (dní)
+  duplicitOf?: string // id blízkého podnětu stejné kategorie (možný duplikát)
+  duplicitVzdalenost?: number // vzdálenost k duplicitnímu páru (m)
 }
 
 export interface User {

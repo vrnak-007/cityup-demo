@@ -15,7 +15,9 @@ import { Reservation } from './screens/obcan/Reservation'
 import { FileAccess } from './screens/obcan/FileAccess'
 import { Grants } from './screens/obcan/Grants'
 import { Queue } from './screens/urednik/Queue'
-import { SubmissionDetail } from './screens/urednik/SubmissionDetail'
+import { PodaniDetail } from './screens/urednik/PodaniDetail'
+import { Poplatky } from './screens/urednik/Poplatky'
+import { NesparovanePlatby } from './screens/urednik/NesparovanePlatby'
 import { Kanban } from './screens/urednik/Kanban'
 import { ReportDetail } from './screens/urednik/ReportDetail'
 import { Dashboard } from './screens/starosta/Dashboard'
@@ -92,8 +94,14 @@ export function App() {
     case 'urednik/fronta':
       content = <Queue />
       break
-    case 'urednik/detail':
-      content = <SubmissionDetail />
+    case 'urednik/podani':
+      content = <PodaniDetail />
+      break
+    case 'urednik/poplatky':
+      content = <Poplatky />
+      break
+    case 'urednik/platby':
+      content = <NesparovanePlatby />
       break
     case 'urednik/podnety':
       content = <Kanban />

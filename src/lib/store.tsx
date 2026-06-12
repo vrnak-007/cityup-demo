@@ -6,74 +6,125 @@ import {
   useRef,
   type ReactNode,
 } from 'react'
-import type { Report, Submission, SubmissionStatus, User } from './types'
-import { MOCK_USER, SEED_REPORTS, SEED_SUBMISSIONS } from './mockData'
+import type { Report, SubmissionStatus, User } from './types'
+import { MOCK_USER } from './mockData'
+import type {
+  Podani,
+  PodaniStav,
+  Poplatnik,
+  PrichoziPlatba,
+  Notifikace,
+  Resitel,
+} from '../data/types'
+import { SEED_PODANI } from '../data/podani'
+import { SEED_POPLATKY, SEED_PRICHOZI_PLATBY } from '../data/poplatky'
+import { SEED_PODNETY } from '../data/podnety'
+import {
+  CURRENT_OFFICER,
+  SEED_NOTIFIKACE,
+  SEED_REZERVACE_DNES,
+} from '../data/officer'
 
-// A draft carries the citizen flow's data across screens (form → summary →
-// payment → status) without touching the URL or any storage.
+// A draft carries the citizen flow's data across screens.
 export interface Draft {
-  kind: Submission['kind']
+  kind: 'pes' | 'odpad' | 'obecne'
   title: string
   amount: number
   vs: string
   spdMessage: string
   detail: { label: string; value: string }[]
-  backTo: string // hash of the form this draft came from (Summary „Zpět")
-  // True for agendas with a fee (dog, waste); false for free submissions.
+  backTo: string
   requiresPayment: boolean
 }
 
+export interface ObcanZprava {
+  id: string
+  text: string
+  kdy: string
+}
+
 interface AppState {
+  // citizen
   user: User | null
-  submissions: Submission[]
-  reports: Report[]
   notificationsEnabled: boolean
   draft: Draft | null
   activeId: string | null
-  // Real elapsed seconds from login to the finished status screen.
   flowElapsedSec: number | null
+  obcanZpravy: ObcanZprava[]
 
+  // back-office datasets
+  podani: Podani[]
+  poplatky: Poplatnik[]
+  prichoziPlatby: PrichoziPlatba[]
+  reports: Report[]
+  notifikace: Notifikace[]
+  currentOfficer: string
+  rezervaceDnes: typeof SEED_REZERVACE_DNES
+
+  // citizen actions
   login: () => void
   logout: () => void
   startTimer: () => void
   stopTimer: () => number
   setDraft: (d: Draft | null) => void
-  submitDraft: () => string // creates submission, returns its id
+  submitDraft: () => string
   markPaid: (id: string) => void
   advanceToDelivered: (id: string) => void
   setNotifications: (on: boolean) => void
+  hodnotitPodani: (id: string, hvezdy: number) => void
+
+  // reports
   updateReportStatus: (id: string, status: SubmissionStatus) => void
   addReport: (r: Omit<Report, 'id' | 'createdAt' | 'status'>) => string
-  updateSubmissionStatus: (
-    id: string,
-    status: SubmissionStatus,
-    note: string,
-  ) => void
+  mergeDuplicate: (keepId: string, dropId: string) => void
+
+  // officer actions
+  prevzitPodani: (id: string) => void
+  predatPodani: (id: string, resitel: Resitel) => void
+  schvalitVyridit: (id: string) => void
+  vratitKDoplneni: (id: string, text: string) => void
+  sparovatPlatbu: (platbaId: string) => void
 }
 
 const Ctx = createContext<AppState | null>(null)
 
-let submissionSeq = 123 // next id → CTU-2026-000123
-let reportSeq = 41
+const AGENDA_LABEL: Record<Draft['kind'], string> = {
+  pes: 'Psi',
+  odpad: 'Odpad',
+  obecne: 'Obecné podání',
+}
+const AGENDA_ODBOR: Record<Draft['kind'], string> = {
+  pes: 'Finanční odbor',
+  odpad: 'Finanční odbor',
+  obecne: 'Podatelna',
+}
 
-function nextSubmissionId(): string {
-  const n = submissionSeq++
-  return `CTU-2026-${n.toString().padStart(6, '0')}`
-}
-function nextReportId(): string {
-  const n = reportSeq++
-  return `PD-2026-${n.toString().padStart(5, '0')}`
-}
+// Citizen-created ids start at 200 to avoid colliding with the seed (100–129).
+let submissionSeq = 200
+let reportSeq = 50
+let zpravaSeq = 1
+const nextSubmissionId = () =>
+  `CTU-2026-${String(submissionSeq++).padStart(6, '0')}`
+const nextReportId = () => `PD-2026-${String(reportSeq++).padStart(5, '0')}`
+
+const TODAY = '12. 6. 2026'
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [submissions, setSubmissions] = useState<Submission[]>(SEED_SUBMISSIONS)
-  const [reports, setReports] = useState<Report[]>(SEED_REPORTS)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [draft, setDraftState] = useState<Draft | null>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [flowElapsedSec, setFlowElapsedSec] = useState<number | null>(null)
+  const [obcanZpravy, setObcanZpravy] = useState<ObcanZprava[]>([])
   const startRef = useRef<number | null>(null)
+
+  const [podani, setPodani] = useState<Podani[]>(SEED_PODANI)
+  const [poplatky] = useState<Poplatnik[]>(SEED_POPLATKY)
+  const [prichoziPlatby, setPrichoziPlatby] = useState<PrichoziPlatba[]>(
+    SEED_PRICHOZI_PLATBY,
+  )
+  const [reports, setReports] = useState<Report[]>(SEED_PODNETY)
+  const [notifikace] = useState<Notifikace[]>(SEED_NOTIFIKACE)
 
   const login = useCallback(() => setUser(MOCK_USER), [])
   const logout = useCallback(() => setUser(null), [])
@@ -82,7 +133,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     startRef.current = performance.now()
     setFlowElapsedSec(null)
   }, [])
-
   const stopTimer = useCallback(() => {
     const sec = startRef.current
       ? (performance.now() - startRef.current) / 1000
@@ -97,44 +147,59 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const id = nextSubmissionId()
     const current = draft
     if (!current) return id
-    const sub: Submission = {
+    const p: Podani = {
       id,
-      kind: current.kind,
-      title: current.title,
-      citizen: user?.name ?? 'Jan Novák',
-      amount: current.amount,
-      status: 'novy',
-      createdAt: '12. 6. 2026',
-      paid: false,
+      agenda: AGENDA_LABEL[current.kind],
+      zadatel: user?.name ?? 'Jan Novák',
+      email: 'jan.novak@email.cz',
+      castka: current.amount,
+      stav: 'novy',
+      resitel: null,
+      odbor: AGENDA_ODBOR[current.kind],
+      podano_at: TODAY,
+      podanoDni: 0,
+      historie: [{ stav: 'Podáno', kdy: TODAY, kdo: 'Občan' }],
       detail: current.detail,
     }
-    setSubmissions((prev) => [sub, ...prev])
+    setPodani((prev) => [p, ...prev])
     setActiveId(id)
     return id
   }, [draft, user])
 
   const markPaid = useCallback((id: string) => {
-    setSubmissions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, paid: true } : s)),
+    setPodani((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              stav: p.stav === 'novy' ? 'zaplaceno' : p.stav,
+              historie: [
+                ...p.historie,
+                { stav: 'Zaplaceno', kdy: TODAY, kdo: 'Systém' },
+              ],
+            }
+          : p,
+      ),
     )
   }, [])
 
-  const advanceToDelivered = useCallback((id: string) => {
-    setSubmissions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status: 'reseni' } : s)),
-    )
-  }, [])
+  // The citizen timeline animation is purely visual; officer state is unchanged.
+  const advanceToDelivered = useCallback(() => {}, [])
 
   const setNotifications = useCallback(
     (on: boolean) => setNotificationsEnabled(on),
     [],
   )
 
+  const hodnotitPodani = useCallback((id: string, hvezdy: number) => {
+    setPodani((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, hodnoceni: hvezdy } : p)),
+    )
+  }, [])
+
   const updateReportStatus = useCallback(
     (id: string, status: SubmissionStatus) => {
-      setReports((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status } : r)),
-      )
+      setReports((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)))
     },
     [],
   )
@@ -142,37 +207,123 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addReport = useCallback(
     (r: Omit<Report, 'id' | 'createdAt' | 'status'>): string => {
       const id = nextReportId()
-      const report: Report = {
-        ...r,
-        id,
-        createdAt: '12. 6. 2026',
-        status: 'novy',
-      }
-      setReports((prev) => [report, ...prev])
+      setReports((prev) => [
+        { ...r, id, createdAt: TODAY, status: 'novy' },
+        ...prev,
+      ])
       return id
     },
     [],
   )
 
-  const updateSubmissionStatus = useCallback(
-    (id: string, status: SubmissionStatus, note: string) => {
-      setSubmissions((prev) =>
-        prev.map((s) =>
-          s.id === id ? { ...s, status, officerNote: note } : s,
+  const mergeDuplicate = useCallback((keepId: string, dropId: string) => {
+    setReports((prev) =>
+      prev
+        .filter((r) => r.id !== dropId)
+        .map((r) =>
+          r.id === keepId
+            ? { ...r, duplicitOf: undefined, duplicitVzdalenost: undefined }
+            : r,
         ),
-      )
-    },
-    [],
-  )
+    )
+  }, [])
+
+  // --- officer actions ---
+  const addKrok = (p: Podani, stav: string, komentar?: string): Podani => ({
+    ...p,
+    historie: [
+      ...p.historie,
+      { stav, kdy: TODAY, kdo: CURRENT_OFFICER, komentar },
+    ],
+  })
+
+  const prevzitPodani = useCallback((id: string) => {
+    setPodani((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? addKrok(
+              {
+                ...p,
+                resitel: CURRENT_OFFICER as Resitel,
+                stav: 'reseni' as PodaniStav,
+                prevzato_at: TODAY,
+              },
+              'Převzato',
+            )
+          : p,
+      ),
+    )
+  }, [])
+
+  const predatPodani = useCallback((id: string, resitel: Resitel) => {
+    setPodani((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? addKrok({ ...p, resitel }, 'Předáno', `Předáno řešiteli ${resitel}`)
+          : p,
+      ),
+    )
+  }, [])
+
+  const schvalitVyridit = useCallback((id: string) => {
+    setPodani((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? addKrok(
+              {
+                ...p,
+                stav: 'vyrizeno' as PodaniStav,
+                vyrizeno_at: TODAY,
+                dobaVyrizeniDni: p.podanoDni,
+              },
+              'Vyřízeno',
+            )
+          : p,
+      ),
+    )
+  }, [])
+
+  const vratitKDoplneni = useCallback((id: string, text: string) => {
+    setPodani((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? addKrok(
+              { ...p, stav: 'vraceno' as PodaniStav },
+              'Vráceno k doplnění',
+              text,
+            )
+          : p,
+      ),
+    )
+    // Mock notification to the citizen.
+    setObcanZpravy((prev) => [
+      {
+        id: `z${zpravaSeq++}`,
+        text: `Vaše podání ${id} bylo vráceno k doplnění. ${text}`,
+        kdy: TODAY,
+      },
+      ...prev,
+    ])
+  }, [])
+
+  const sparovatPlatbu = useCallback((platbaId: string) => {
+    setPrichoziPlatby((prev) => prev.filter((x) => x.id !== platbaId))
+  }, [])
 
   const value: AppState = {
     user,
-    submissions,
-    reports,
     notificationsEnabled,
     draft,
     activeId,
     flowElapsedSec,
+    obcanZpravy,
+    podani,
+    poplatky,
+    prichoziPlatby,
+    reports,
+    notifikace,
+    currentOfficer: CURRENT_OFFICER,
+    rezervaceDnes: SEED_REZERVACE_DNES,
     login,
     logout,
     startTimer,
@@ -182,9 +333,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     markPaid,
     advanceToDelivered,
     setNotifications,
+    hodnotitPodani,
     updateReportStatus,
     addReport,
-    updateSubmissionStatus,
+    mergeDuplicate,
+    prevzitPodani,
+    predatPodani,
+    schvalitVyridit,
+    vratitKDoplneni,
+    sparovatPlatbu,
   }
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

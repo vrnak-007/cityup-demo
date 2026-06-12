@@ -6,14 +6,17 @@ import { FormShell } from '../../ui/FormShell'
 import { GovButton } from '../../ui/GovButton'
 import { Card } from '../../ui/Card'
 import { Timeline } from '../../ui/Timeline'
+import { StarRating } from '../../ui/StarRating'
 import { CheckIcon } from '../../ui/Icons'
 import type { TimelineStep } from '../../lib/types'
 
 export function Status() {
-  const { draft, activeId, stopTimer, advanceToDelivered } = useApp()
+  const { draft, activeId, stopTimer, advanceToDelivered, hodnotitPodani } =
+    useApp()
   const navigate = useNavigate()
   const [delivered, setDelivered] = useState(false)
   const [elapsed, setElapsed] = useState<number | null>(null)
+  const [rating, setRating] = useState(0)
   const measuredRef = useRef(false)
 
   useEffect(() => {
@@ -79,6 +82,31 @@ export function Status() {
           <span className="tnum text-label font-medium text-ink">{activeId}</span>
         </div>
         <Timeline steps={steps} />
+      </Card>
+
+      {/* Star rating — feeds the mayor's satisfaction metric. */}
+      <Card className="flex flex-col items-center gap-4 text-center">
+        {rating === 0 ? (
+          <>
+            <span className="text-body text-ink">
+              Jak jste spokojeni s vyřízením?
+            </span>
+            <StarRating
+              value={rating}
+              onChange={(v) => {
+                setRating(v)
+                if (activeId) hodnotitPodani(activeId, v)
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <StarRating value={rating} readOnly />
+            <span className="text-body text-success">
+              Děkujeme za hodnocení.
+            </span>
+          </>
+        )}
       </Card>
 
       <div className="flex flex-col gap-2">

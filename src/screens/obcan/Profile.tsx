@@ -2,20 +2,43 @@ import { useNavigate } from '../../lib/router'
 import { useApp } from '../../lib/store'
 import { formatKc } from '../../lib/format'
 import { Card } from '../../ui/Card'
-import { StatusBadge } from '../../ui/StatusBadge'
+import { PodaniStavBadge } from '../../ui/PodaniStavBadge'
 import { Toggle } from '../../ui/Toggle'
 import { GovButton } from '../../ui/GovButton'
 import { QrIcon, BellIcon, ChevronRightIcon } from '../../ui/Icons'
 
 export function Profile() {
-  const { user, submissions, notificationsEnabled, setNotifications } = useApp()
+  const {
+    user,
+    podani,
+    obcanZpravy,
+    notificationsEnabled,
+    setNotifications,
+  } = useApp()
   const navigate = useNavigate()
-  const mine = submissions.filter((s) => s.citizen === (user?.name ?? 'Jan Novák'))
+  const mine = podani.filter((s) => s.zadatel === (user?.name ?? 'Jan Novák'))
 
   return (
     <div className="mx-auto w-full max-w-form px-4 pb-12 pt-6">
       <h1 className="text-display text-ink">Můj profil</h1>
       <p className="mt-2 text-body text-ink-soft">{user?.name ?? 'Jan Novák'}</p>
+
+      {/* Messages from the office (e.g. a submission returned for completion). */}
+      {obcanZpravy.length > 0 && (
+        <div className="mt-6 flex flex-col gap-2">
+          {obcanZpravy.map((z) => (
+            <Card key={z.id} tint className="flex items-start gap-4">
+              <span className="mt-[2px] text-warning">
+                <BellIcon />
+              </span>
+              <div className="flex flex-col">
+                <span className="text-body text-ink">{z.text}</span>
+                <span className="tnum text-caption text-ink-soft">{z.kdy}</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Mock push notification — what the citizen would receive next year. */}
       {notificationsEnabled && (
@@ -57,11 +80,14 @@ export function Profile() {
                   }`}
                 >
                   <span className="flex flex-col gap-2">
-                    <span className="text-body font-medium text-ink">{s.title}</span>
-                    <span className="tnum text-caption text-ink-soft">
-                      {s.id} · {s.createdAt} · {formatKc(s.amount)}
+                    <span className="text-body font-medium text-ink">
+                      {s.agenda}
                     </span>
-                    <StatusBadge status={s.status} />
+                    <span className="tnum text-caption text-ink-soft">
+                      {s.id} · {s.podano_at}
+                      {s.castka > 0 ? ` · ${formatKc(s.castka)}` : ''}
+                    </span>
+                    <PodaniStavBadge stav={s.stav} />
                   </span>
                   <ChevronRightIcon className="text-ink-soft" />
                 </button>

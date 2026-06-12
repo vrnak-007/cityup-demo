@@ -1,5 +1,7 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useNavigate, useRoute } from '../lib/router'
+import { useApp } from '../lib/store'
+import { BellIcon } from './Icons'
 
 const ROLES: { key: string; label: string; home: string }[] = [
   { key: 'obcan', label: 'OBČAN', home: 'obcan/uvod' },
@@ -11,6 +13,9 @@ const ROLES: { key: string; label: string; home: string }[] = [
 export function AppChrome({ children }: { children: ReactNode }) {
   const { role } = useRoute()
   const navigate = useNavigate()
+  const { notifikace } = useApp()
+  const [bellOpen, setBellOpen] = useState(false)
+  const showBell = role === 'urednik' || role === 'starosta'
 
   const subtitle =
     role === 'urednik'
@@ -59,7 +64,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
 
       {/* Municipal header. Logo + name returns to the role's main screen. */}
       <header className="bg-gov-blue-dark text-white">
-        <div className="mx-auto flex max-w-app items-center px-4 py-4">
+        <div className="mx-auto flex max-w-app items-center justify-between px-4 py-4">
           <button
             type="button"
             onClick={() => navigate(home)}
@@ -76,6 +81,51 @@ export function AppChrome({ children }: { children: ReactNode }) {
               <span className="text-caption text-white/80">{subtitle}</span>
             </span>
           </button>
+
+          {showBell && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setBellOpen((v) => !v)}
+                aria-label={`Oznámení (${notifikace.length})`}
+                className="gov-focus relative flex h-12 w-12 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10"
+              >
+                <BellIcon size={24} />
+                {notifikace.length > 0 && (
+                  <span
+                    className="tnum absolute right-2 top-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[11px] font-bold text-white"
+                    style={{ backgroundColor: 'var(--error)' }}
+                  >
+                    {notifikace.length}
+                  </span>
+                )}
+              </button>
+              {bellOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-30"
+                    onClick={() => setBellOpen(false)}
+                  />
+                  <div className="gov-fade absolute right-0 z-40 mt-2 w-80 overflow-hidden rounded-card border border-line bg-paper text-ink shadow-card">
+                    <div className="border-b border-line px-4 py-2 text-label font-medium text-ink-soft">
+                      Oznámení
+                    </div>
+                    <ul>
+                      {notifikace.map((n) => (
+                        <li
+                          key={n.id}
+                          className="flex flex-col gap-1 border-b border-line px-4 py-2 last:border-0"
+                        >
+                          <span className="text-body text-ink">{n.text}</span>
+                          <span className="text-caption text-ink-soft">{n.kdy}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
