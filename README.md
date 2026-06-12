@@ -55,20 +55,24 @@ Role se přepínají lištou nahoře, nebo přímo přes hash.
 | Poplatek za odpad | `#obcan/odpad-prihlaseni` → `#obcan/odpad` |
 | Obecné podání | `#obcan/podani-prihlaseni` → `#obcan/podani` |
 | Rezervace na úřad | `#obcan/rezervace` |
+| Jak nám to jde (veřejná transparentnost) | `#obcan/transparentnost` |
 | Nahlížení do spisu *(vize)* | `#obcan/spis` |
 | Dotace obce *(vize)* | `#obcan/dotace` |
 
 ### Úředník
 | Obrazovka | Hash |
 |---|---|
-| Fronta podání | `#urednik/fronta` |
-| Detail podání + změna stavu | `#urednik/detail/CTU-2026-000122` |
-| Kanban podnětů | `#urednik/podnety` |
+| Moje fronta (filtry, SLA, převzít/předat) | `#urednik/fronta` |
+| Detail podání (historie, schválit, vrátit se šablonou) | `#urednik/podani/CTU-2026-000120` |
+| Výběr poplatků (souhrn + hromadné upomínky s QR) | `#urednik/poplatky` |
+| Nespárované platby | `#urednik/platby` |
+| Kanban podnětů (odbor, duplikáty) | `#urednik/podnety` |
+| Detail podnětu (auto-routing, sloučit duplikát) | `#urednik/podnet/PD-2026-00042` |
 
 ### Starosta
 | Obrazovka | Hash |
 |---|---|
-| Dashboard (KPI + grafy) | `#starosta/dashboard` |
+| Dashboard — KPI, SLA, spokojenost, výběr poplatků, mapa, report | `#starosta/dashboard` |
 
 ---
 
