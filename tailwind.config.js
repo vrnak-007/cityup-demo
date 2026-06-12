@@ -10,8 +10,14 @@ export default {
       4: '16px',
       6: '24px',
       8: '32px',
+      10: '40px', // control heights (compact buttons)
       12: '48px',
       16: '64px',
+      // Larger structural sizes (all multiples of 8): media boxes, map heights,
+      // and the fixed-footer clearance on form screens.
+      32: '128px',
+      40: '160px',
+      72: '288px',
     },
     extend: {
       colors: {
