@@ -122,6 +122,9 @@ export function App() {
     case 'spravce/pruvodce':
       content = <Pruvodce />
       break
+    case 'spravce/sprava':
+      content = <Pruvodce />
+      break
     default:
       content = <Placeholder name={path} />
   }

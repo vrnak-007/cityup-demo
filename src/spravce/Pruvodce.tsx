@@ -2,6 +2,8 @@ import { useTenant } from './tenant'
 import { WizardShell } from './WizardShell'
 import { GovButton } from '../ui/GovButton'
 import { Step1, Step2, Step3, Step4, Step5 } from './StepsP1'
+import { Step6, Step7, Step8, Step9 } from './StepsP2'
+import { Success } from './Success'
 
 const HINTY = [
   'Načtěte údaje obce z ARES — stačí IČO, zbytek se doplní sám.',
@@ -15,16 +17,17 @@ const HINTY = [
   'Zkontrolujte připravenost a spusťte portál pro občany.',
 ]
 
-function Placeholder({ n }: { n: number }) {
-  return (
-    <p className="text-body text-ink-soft">
-      Krok {n} — připravujeme v této části dema.
-    </p>
-  )
-}
-
 export function Pruvodce() {
-  const { krok, next, prev, totalKroku } = useTenant()
+  const { cfg, krok, next, prev, totalKroku, spustit, stopTimer } = useTenant()
+
+  // After launch the wizard is replaced by the success screen.
+  if (cfg.spusteno) return <Success />
+
+  const launch = () => {
+    stopTimer()
+    spustit()
+    window.scrollTo({ top: 0 })
+  }
 
   const step = (() => {
     switch (krok) {
@@ -38,27 +41,35 @@ export function Pruvodce() {
         return <Step4 />
       case 5:
         return <Step5 />
+      case 6:
+        return <Step6 />
+      case 7:
+        return <Step7 />
+      case 8:
+        return <Step8 />
+      case 9:
+        return <Step9 onLaunch={launch} />
       default:
-        return <Placeholder n={krok} />
+        return null
     }
   })()
 
   return (
-    <WizardShell hint={HINTY[krok - 1]}>
+    <WizardShell hint={HINTY[krok - 1]} hidePreview={krok === 9}>
       {step}
 
       <div className="flex items-center justify-between gap-4 border-t border-line pt-6">
         <GovButton variant="plain" onClick={prev} disabled={krok === 1}>
           Zpět
         </GovButton>
-        <div className="flex items-center gap-2">
-          <GovButton variant="plain" onClick={next} disabled={krok === totalKroku}>
-            Přeskočit
-          </GovButton>
-          <GovButton onClick={next} disabled={krok === totalKroku}>
-            Pokračovat
-          </GovButton>
-        </div>
+        {krok < totalKroku && (
+          <div className="flex items-center gap-2">
+            <GovButton variant="plain" onClick={next}>
+              Přeskočit
+            </GovButton>
+            <GovButton onClick={next}>Pokračovat</GovButton>
+          </div>
+        )}
       </div>
     </WizardShell>
   )
