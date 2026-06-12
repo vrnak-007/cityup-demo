@@ -15,7 +15,7 @@ export function FileAccess() {
     <FormShell
       title="Nahlížení do spisu"
       subtitle="Spis sp. zn. ŽP/412/2026"
-      back="obcan/profil"
+      back="obcan/uvod"
     >
       <InfoBar>
         Vyžaduje napojení na spisovou službu úřadu — dostupné od fáze 3.

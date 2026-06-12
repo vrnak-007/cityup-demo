@@ -10,7 +10,7 @@ export function Grants() {
     <FormShell
       title="Dotace obce"
       subtitle="Program podpory spolkové činnosti"
-      back="obcan/profil"
+      back="obcan/uvod"
     >
       <InfoBar>
         Náhled budoucí agendy — příjem žádostí se spustí ve fázi 3.
