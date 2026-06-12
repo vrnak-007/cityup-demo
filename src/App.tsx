@@ -23,6 +23,8 @@ import { Kanban } from './screens/urednik/Kanban'
 import { ReportDetail } from './screens/urednik/ReportDetail'
 import { Dashboard } from './screens/starosta/Dashboard'
 import { Pruvodce } from './spravce/Pruvodce'
+import { Success } from './spravce/Success'
+import { Admin } from './spravce/Admin'
 
 function Placeholder({ name }: { name: string }) {
   return (
@@ -122,8 +124,11 @@ export function App() {
     case 'spravce/pruvodce':
       content = <Pruvodce />
       break
+    case 'spravce/hotovo':
+      content = <Success />
+      break
     case 'spravce/sprava':
-      content = <Pruvodce />
+      content = <Admin />
       break
     default:
       content = <Placeholder name={path} />

@@ -1,9 +1,9 @@
 import { useTenant } from './tenant'
+import { useNavigate } from '../lib/router'
 import { WizardShell } from './WizardShell'
 import { GovButton } from '../ui/GovButton'
 import { Step1, Step2, Step3, Step4, Step5 } from './StepsP1'
 import { Step6, Step7, Step8, Step9 } from './StepsP2'
-import { Success } from './Success'
 
 const HINTY = [
   'Načtěte údaje obce z ARES — stačí IČO, zbytek se doplní sám.',
@@ -19,14 +19,13 @@ const HINTY = [
 
 export function Pruvodce() {
   const { cfg, krok, next, prev, totalKroku, spustit, stopTimer } = useTenant()
-
-  // After launch the wizard is replaced by the success screen.
-  if (cfg.spusteno) return <Success />
+  const navigate = useNavigate()
+  const editMode = cfg.spusteno // po spuštění slouží wizard k úpravám z admina
 
   const launch = () => {
     stopTimer()
     spustit()
-    window.scrollTo({ top: 0 })
+    navigate('spravce/hotovo')
   }
 
   const step = (() => {
@@ -55,20 +54,26 @@ export function Pruvodce() {
   })()
 
   return (
-    <WizardShell hint={HINTY[krok - 1]} hidePreview={krok === 9}>
+    <WizardShell hint={HINTY[krok - 1]} hidePreview={krok === 9 && !editMode}>
       {step}
 
       <div className="flex items-center justify-between gap-4 border-t border-line pt-6">
         <GovButton variant="plain" onClick={prev} disabled={krok === 1}>
           Zpět
         </GovButton>
-        {krok < totalKroku && (
-          <div className="flex items-center gap-2">
-            <GovButton variant="plain" onClick={next}>
-              Přeskočit
-            </GovButton>
-            <GovButton onClick={next}>Pokračovat</GovButton>
-          </div>
+        {editMode ? (
+          <GovButton onClick={() => navigate('spravce/sprava')}>
+            Hotovo — zpět do správy
+          </GovButton>
+        ) : (
+          krok < totalKroku && (
+            <div className="flex items-center gap-2">
+              <GovButton variant="plain" onClick={next}>
+                Přeskočit
+              </GovButton>
+              <GovButton onClick={next}>Pokračovat</GovButton>
+            </div>
+          )
         )}
       </div>
     </WizardShell>
