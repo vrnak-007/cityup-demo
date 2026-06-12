@@ -80,6 +80,19 @@ export function Home() {
         </p>
       )}
 
+      <button
+        onClick={() => navigate('obcan/transparentnost')}
+        className="gov-focus mt-6 flex w-full items-center justify-between rounded-card border border-line bg-gov-blue-tint p-4 text-left transition-colors hover:border-gov-blue"
+      >
+        <span className="flex flex-col">
+          <span className="text-body font-medium text-ink">Jak nám to jde</span>
+          <span className="text-caption text-ink-soft">
+            Veřejné statistiky výkonu úřadu
+          </span>
+        </span>
+        <ChevronRightIcon className="text-gov-blue" />
+      </button>
+
       {/* „Vize" — features coming in a later phase, reachable for the demo. */}
       <h2 className="mt-8 text-h2 text-ink">Připravujeme</h2>
       <div className="mt-4 flex flex-col gap-2">

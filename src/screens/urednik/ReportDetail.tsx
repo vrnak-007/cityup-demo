@@ -15,9 +15,12 @@ const STATES: { value: SubmissionStatus; label: string }[] = [
 
 export function ReportDetail() {
   const { param } = useRoute()
-  const { reports, updateReportStatus } = useApp()
+  const { reports, updateReportStatus, mergeDuplicate } = useApp()
   const navigate = useNavigate()
   const report = reports.find((r) => r.id === param)
+  const duplikat = report?.duplicitOf
+    ? reports.find((r) => r.id === report.duplicitOf)
+    : undefined
 
   if (!report) {
     return (
@@ -49,6 +52,27 @@ export function ReportDetail() {
         {report.id} · nahlášeno {report.createdAt}
       </p>
 
+      {/* Možný duplikát (P3.11). */}
+      {duplikat && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-gov-blue-tint px-4 py-4">
+          <p className="text-body text-ink">
+            Možný duplicitní podnět {report.duplicitVzdalenost} m odtud (
+            <span className="tnum">{duplikat.id}</span>, {duplikat.category}).
+          </p>
+          <div className="flex gap-2">
+            <GovButton onClick={() => mergeDuplicate(report.id, duplikat.id)}>
+              Sloučit
+            </GovButton>
+            <GovButton
+              variant="secondary"
+              onClick={() => mergeDuplicate(report.id, '')}
+            >
+              Ponechat
+            </GovButton>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 grid gap-6 md:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-4">
           {report.hasPhoto && (
@@ -77,6 +101,17 @@ export function ReportDetail() {
         </div>
 
         <div className="flex flex-col gap-4">
+          {/* Auto-routing (P3.10). */}
+          <Card tint className="flex flex-col gap-2">
+            <span className="text-caption font-medium text-ink-soft">
+              Automaticky přiděleno
+            </span>
+            <span className="text-body font-medium text-ink">{report.odbor}</span>
+            <span className="text-caption text-ink-soft">
+              pravidlo {report.category} → {report.odbor}
+            </span>
+          </Card>
+
           <Card className="flex flex-col gap-4">
             <span className="text-h2 text-ink">Změna stavu</span>
             <div className="flex flex-col gap-2">

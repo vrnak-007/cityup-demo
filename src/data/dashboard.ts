@@ -10,6 +10,9 @@ export const SLA_TREND: { month: string; pct: number }[] = [
   { month: 'Čvn', pct: 88 },
 ]
 
+// Kumulativní počet vyřešených podnětů za rok (veřejná transparentnost).
+export const PODNETY_VYRESENO_ROK = 41
+
 // Top opakované/řešené problémy pro report zastupitelstvu.
 export const TOP_PROBLEMY: { nazev: string; pocet: number; odbor: string }[] = [
   { nazev: 'Výtluky a stav vozovek', pocet: 9, odbor: 'Doprava' },

@@ -127,6 +127,19 @@ export function Kanban() {
                           />
                         </span>
                         <span className="text-body text-ink">{r.text}</span>
+                        <span className="flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-paper px-2 py-1 text-caption font-medium text-ink-soft">
+                            Odbor: {r.odbor}
+                          </span>
+                          {r.duplicitOf && (
+                            <span
+                              className="rounded-full px-2 py-1 text-caption font-medium text-white"
+                              style={{ backgroundColor: 'var(--warning)' }}
+                            >
+                              možný duplikát
+                            </span>
+                          )}
+                        </span>
                       </button>
 
                       {/* Move controls (separate from the detail click). */}

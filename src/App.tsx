@@ -14,6 +14,7 @@ import { GeneralSubmission } from './screens/obcan/GeneralSubmission'
 import { Reservation } from './screens/obcan/Reservation'
 import { FileAccess } from './screens/obcan/FileAccess'
 import { Grants } from './screens/obcan/Grants'
+import { Transparency } from './screens/obcan/Transparency'
 import { Queue } from './screens/urednik/Queue'
 import { PodaniDetail } from './screens/urednik/PodaniDetail'
 import { Poplatky } from './screens/urednik/Poplatky'
@@ -64,6 +65,9 @@ export function App() {
       break
     case 'obcan/mapa':
       content = <PublicMap />
+      break
+    case 'obcan/transparentnost':
+      content = <Transparency />
       break
     // P2 — waste fee (login gate → form)
     case 'obcan/odpad-prihlaseni':
