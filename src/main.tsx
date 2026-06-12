@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { App } from './App'
 import { AppProvider } from './lib/store'
+import { TenantProvider } from './spravce/tenant'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
-      <App />
+      <TenantProvider>
+        <App />
+      </TenantProvider>
     </AppProvider>
   </StrictMode>,
 )

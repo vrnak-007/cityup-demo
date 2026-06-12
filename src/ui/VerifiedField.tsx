@@ -3,11 +3,16 @@ import { ShieldIcon } from './Icons'
 interface Props {
   label: string
   value: string
+  caption?: string
 }
 
 // Non-editable field on a tinted block — the signature element of the demo.
-// Communicates „this came from your verified identity, you don't retype it".
-export function VerifiedField({ label, value }: Props) {
+// Communicates „this came from a verified source, you don't retype it".
+export function VerifiedField({
+  label,
+  value,
+  caption = 'Ověřeno Identitou občana',
+}: Props) {
   return (
     <div className="flex flex-col gap-2">
       <span className="text-label font-medium text-ink">{label}</span>
@@ -18,9 +23,7 @@ export function VerifiedField({ label, value }: Props) {
         />
         <div className="flex flex-col">
           <span className="text-body text-ink">{value}</span>
-          <span className="text-caption text-ink-soft">
-            Ověřeno Identitou občana
-          </span>
+          <span className="text-caption text-ink-soft">{caption}</span>
         </div>
       </div>
     </div>

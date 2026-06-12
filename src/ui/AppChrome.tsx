@@ -1,12 +1,14 @@
 import { useState, type ReactNode } from 'react'
 import { useNavigate, useRoute } from '../lib/router'
 import { useApp } from '../lib/store'
+import { useTenant } from '../spravce/tenant'
 import { BellIcon } from './Icons'
 
 const ROLES: { key: string; label: string; home: string }[] = [
   { key: 'obcan', label: 'OBČAN', home: 'obcan/uvod' },
   { key: 'urednik', label: 'ÚŘEDNÍK', home: 'urednik/fronta' },
   { key: 'starosta', label: 'STAROSTA', home: 'starosta/dashboard' },
+  { key: 'spravce', label: 'SPRÁVCE', home: 'spravce/pruvodce' },
 ]
 
 // Demo-only role switcher (a discreet strip) + the municipal header.
@@ -14,15 +16,20 @@ export function AppChrome({ children }: { children: ReactNode }) {
   const { role } = useRoute()
   const navigate = useNavigate()
   const { notifikace } = useApp()
+  const { cfg } = useTenant()
   const [bellOpen, setBellOpen] = useState(false)
   const showBell = role === 'urednik' || role === 'starosta'
+
+  const spravceHome = cfg.spusteno ? 'spravce/sprava' : 'spravce/pruvodce'
 
   const subtitle =
     role === 'urednik'
       ? 'Úřední pracoviště · CityUp'
       : role === 'starosta'
         ? 'Vedení obce · CityUp'
-        : 'Portál občana · CityUp'
+        : role === 'spravce'
+          ? 'Nastavení obce · CityUp'
+          : 'Portál občana · CityUp'
 
   // Clicking the logo returns to the current role's main screen.
   const home =
@@ -30,7 +37,9 @@ export function AppChrome({ children }: { children: ReactNode }) {
       ? 'urednik/fronta'
       : role === 'starosta'
         ? 'starosta/dashboard'
-        : 'obcan/uvod'
+        : role === 'spravce'
+          ? spravceHome
+          : 'obcan/uvod'
 
   return (
     <div className="flex min-h-full flex-col">
@@ -46,7 +55,9 @@ export function AppChrome({ children }: { children: ReactNode }) {
               return (
                 <button
                   key={r.key}
-                  onClick={() => navigate(r.home)}
+                  onClick={() =>
+                    navigate(r.key === 'spravce' ? spravceHome : r.home)
+                  }
                   className={[
                     'gov-focus rounded px-2 py-1 text-caption font-medium tracking-wide transition-colors',
                     active

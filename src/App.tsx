@@ -22,6 +22,7 @@ import { NesparovanePlatby } from './screens/urednik/NesparovanePlatby'
 import { Kanban } from './screens/urednik/Kanban'
 import { ReportDetail } from './screens/urednik/ReportDetail'
 import { Dashboard } from './screens/starosta/Dashboard'
+import { Pruvodce } from './spravce/Pruvodce'
 
 function Placeholder({ name }: { name: string }) {
   return (
@@ -116,6 +117,10 @@ export function App() {
     // ---- STAROSTA ----
     case 'starosta/dashboard':
       content = <Dashboard />
+      break
+    // ---- SPRÁVCE ----
+    case 'spravce/pruvodce':
+      content = <Pruvodce />
       break
     default:
       content = <Placeholder name={path} />
